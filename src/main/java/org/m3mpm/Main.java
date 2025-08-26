@@ -1,22 +1,29 @@
-package org.m3mpm.ver1;
+package org.m3mpm;
 
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
         String str = "Hello World!";
-        printMap(countDuplicateCharacters(str));
+        String strUni = "Привет мир! Привет!";
+        printMap(countDuplicateCharacters2(strUni));
     }
 
     // Версия, которая не учитывает Unicode, то есть работает с UTF-16 - используя 16-битный тип char
-    public static Map<Character,Integer> countDuplicateCharacters(String str){
+    public static Map<Character,Integer> countDuplicateCharacters1(String str){
         Map<Character,Integer> result = new HashMap<>();
         for(int i = 0; i < str.length(); i++){
             char ch = str.charAt(i);
             result.compute(ch,(k,v) -> v==null ? 1 : ++v);
         }
+        return result;
+    }
+
+    public static Map<Character,Long> countDuplicateCharactersStream1(String str){
+        Map<Character,Long> result = str.chars().mapToObj(ch -> (char) ch).collect(Collectors.groupingBy(ch -> ch,Collectors.counting()));
         return result;
     }
 
@@ -34,12 +41,20 @@ public class Main {
         return result;
     }
 
-    public static void printMap(Map<Character,Integer> map){
+    public static Map<String, Long> countDuplicateCharactersStream2(String str) {
+        Map<String, Long> result = str.codePoints()
+                .mapToObj (c -> String.valueOf(Character.toChars (c)))
+                .collect(Collectors.groupingBy(c -> c, Collectors.counting()));
+        return result;
+    }
+
+    public static void printMap(Map<?,?> map){
         StringBuilder sb = new StringBuilder("Содержимое Map:\n");
-        for(Map.Entry<Character,Integer> entry: map.entrySet()){
+        for(Map.Entry<?,?> entry: map.entrySet()){
             sb.append("Ключ: ").append(entry.getKey()).append(", Значение: ").append(entry.getValue()).append("\n");
         }
         System.out.println(sb);
     }
+
 }
 
